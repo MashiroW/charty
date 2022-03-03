@@ -100,7 +100,7 @@ Create a file or fill the one already created with your informations and respect
 [INSERT A PICTURE HERE IM TOO LAZY TO INSERT]
 
 
-# Something you wish you could have read at first
+# About
 Charty was coded in python (v3.7.3)
 
 
