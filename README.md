@@ -101,9 +101,7 @@ Create a file or fill the one already created with your informations and respect
 
 
 # Something you wish you could have read at first
-Charty was coded in python (v3.7.3) and I advise you to don't install it yet because I made it work for my username and someone's only.
-Maybe if I'm not lazy, I'll make it usable by everyone... or you can just open the python file and change the names... but this won't work for more than two people at the same time, again because I'm too lazy atm to fix that little thing but I ironically wasn't to write this ReadMe file and I don't even understand that myself.
-Gimme some pizza and I'll polish it.
+Charty was coded in python (v3.7.3)
 
 
 ## License
