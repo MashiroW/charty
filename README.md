@@ -56,6 +56,9 @@ Create a file or fill the one already created with your informations and respect
 ```
 ([Where do I find the three first values ?](https://github.com/Tyrrrz/DiscordChatExporter/wiki/Obtaining-Token-and-Channel-IDs))
 
+* ##### Q: How to I get someone's userID ?
+* ##### A: Go to User Settings > Advanced > Enable Developer Mode. You will then be able to right click an user and click "Copy ID"
+
 ### 5 How this whole thing looks like once finished
 
 ```bash
