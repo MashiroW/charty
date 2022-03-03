@@ -1,0 +1,13 @@
+{
+    "token": "",
+    "channel_ID": "",
+    "webhook_url": "",
+
+    "users_to_watch"  : [],
+    "users_to_ignore" : [],
+
+    "daily"  : true,
+    "weekly" : true,
+    "monthly": true,
+    "yearly" : true
+}

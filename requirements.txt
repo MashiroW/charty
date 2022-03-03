@@ -1,0 +1,6 @@
+###### Requirements without Version Specifiers ######
+pandas
+numpy
+matplotlib
+datetime
+discord_webhook
