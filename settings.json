@@ -1,13 +1,15 @@
 {
     "token": "",
-    "channel_ID": "",
+    "server_ID": "",
+    "channel_ID": [],
+
     "webhook_url": "",
 
     "users_to_watch"  : [],
     "users_to_ignore" : [],
 
-    "daily"  : true,
-    "weekly" : true,
-    "monthly": true,
-    "yearly" : true
+    "custom_date_daily" : "",
+    "custom_date_weekly" : "",
+
+    "textual_pie_chart" : true
 }
