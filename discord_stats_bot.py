@@ -332,7 +332,7 @@ global client_info
 client_info = get_user_profile()
 
 Date_at_launch = date.today()
-DayTargetDate  = Date_at_launch #+ timedelta(days=1)
+DayTargetDate  = Date_at_launch + timedelta(days=1)
 WeekTargetDate = Date_at_launch + timedelta(weeks=1)
 
 #CUSTOMIZED WEEK START DATE
