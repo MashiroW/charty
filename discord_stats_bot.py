@@ -1,4 +1,6 @@
+import glob
 from ensurepip import version
+
 import os
 import time
 import json
@@ -46,10 +48,21 @@ def sending_procedure(TargetDate, kind=''):
             channels_string += channel + " "
 
         print(channels_string)
-        os.system("dotnet ./DiscordChatExporter/DiscordChatExporter.Cli.dll export -t " + client_info["token"] + " -c " + channels_string + "--after " + cmd_arg + " -f csv -o dataset.csv")
+        os.system("dotnet ./DiscordChatExporter/DiscordChatExporter.Cli.dll export -t " + client_info["token"] + " -c " + channels_string + "--after " + cmd_arg + " -f csv -o channels/%C.csv")
 
     else:
-        os.system("dotnet ./DiscordChatExporter/DiscordChatExporter.Cli.dll exportguild -t " + client_info["token"] + " -g " + client_info["server_ID"] + " --after " + cmd_arg + " -f csv -o dataset.csv")
+        os.system("dotnet ./DiscordChatExporter/DiscordChatExporter.Cli.dll exportguild -t " + client_info["token"] + " -g " + client_info["server_ID"] + " --after " + cmd_arg + " -f csv -o channels/%C.csv")
+
+    path = r'./channels' # use your path
+    all_files = glob.glob(path + "/*.csv")
+
+    li = []
+    for filename in all_files:
+        df = pd.read_csv(filename, index_col=None, header=0)
+        li.append(df)
+        
+    df = pd.concat(li, axis=0, ignore_index=True)
+    df.to_csv('dataset.csv', index=False)
 
     write_log("----- Opening the dataset...") #~
     df = pd.read_csv('dataset.csv')
@@ -68,11 +81,10 @@ def sending_procedure(TargetDate, kind=''):
     write_log("----- Chart #2 saved !")  #~
  
  # -------SENDING TO DISCORD------------
-    os.system("pause")
     write_log("----- Sending the plots to Discord the discord channel...")
 
     #CHART 1
-    message = "`Charty - Marketing Dpt. v" + version + "`\n" + "`[" + now.strftime("%H:%M:%S") + "] - " + pic_name + "`"
+    message = "`Charty - Marketing Dpt. v" + version + " - by Mashiro ☯#8770" + "`\n" + "`[" + now.strftime("%H:%M:%S") + "] - " + pic_name + "`"
     picture_to_discord(path=save_dir + "/" + pic_name, webhook_URL=client_info["webhook_url"], message=message)
     write_log("----- Chart #1 sent...")
 
@@ -259,14 +271,15 @@ def hbar_plot(x, y, save_dir, pic_name): # PLOTS THE HORIZONTAL BAR PLOT OF USER
     plt.xlabel("Proportion of messages")              
     plt.ylabel("User")
     plt.title("Top 25 of the users sending the more messages")
-    plt.text(0.02 , -1 , "Charty - Marketing Dpt. v" + version + " - by Mashiro ☯#8770", color='lightgrey', fontsize=8)
+    #plt.text(0.02 , -1 , "Charty - Marketing Dpt. v" + version + " - by Mashiro ☯#8770", color='lightgrey', fontsize=8)
     #plt.show()
 
     #SAVING
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    plt.savefig(save_dir + "/" + pic_name[0:-4] + "_leaderboard" + pic_name[-4:])
+    path_pic = save_dir + "/" + pic_name[0:-4] + "_leaderboard" + pic_name[-4:]
+    plt.savefig(path_pic)
     plt.clf()
 
 def get_user_hours(df): #returns 2 arrays - x (hours), y (number of msgs)
@@ -340,7 +353,7 @@ write_log("Checking for custom dates...")
 if client_info["custom_date_daily"] != "":
     try:
         target = client_info["custom_date_daily"].split("-")
-        WeekTargetDate = datetime(int(target[0]), int(target[1]), int(target[2])).date()
+        DayTargetDate = datetime(int(target[0]), int(target[1]), int(target[2])).date()
     except:
         print("Error: Make sure you have the right date format: YYYY-MM-DD")
 
@@ -371,3 +384,5 @@ while (1):
     if str(date.today()) == str(WeekTargetDate) and client_info["weekly"]:
         write_log("Weekly plot condition OK")
         WeekTargetDate = sending_procedure(WeekTargetDate, kind='weekly')
+
+    time.sleep(10)
