@@ -1,5 +1,6 @@
 import glob
 from ensurepip import version
+from importlib.machinery import WindowsRegistryFinder
 
 import os
 import time
@@ -270,9 +271,7 @@ def hbar_plot(x, y, save_dir, pic_name): # PLOTS THE HORIZONTAL BAR PLOT OF USER
 
     plt.xlabel("Proportion of messages")              
     plt.ylabel("User")
-    plt.title("Top 25 of the users sending the more messages")
-    #plt.text(0.02 , -1 , "Charty - Marketing Dpt. v" + version + " - by Mashiro ☯#8770", color='lightgrey', fontsize=8)
-    #plt.show()
+    plt.title("Top 25 of the users sending the most messages")
 
     #SAVING
     if not os.path.exists(save_dir):
@@ -297,8 +296,8 @@ def get_user_hours(df): #returns 2 arrays - x (hours), y (number of msgs)
             try:
                 users_hours[msg_authorName][msg_hour] += 1
             except:
-                #if msg_authorName not in users_hours: #CONDITION RETIREE CAR IMPLIQUEE SELON MOI
-                users_hours[msg_authorName] = {}
+                if msg_authorName not in users_hours:
+                    users_hours[msg_authorName] = {}
                 users_hours[msg_authorName][msg_hour] = 1
 
             # users_ratio here
