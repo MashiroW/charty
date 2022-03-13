@@ -1,6 +1,6 @@
 import glob
 from ensurepip import version
-from importlib.machinery import WindowsRegistryFinder
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 
 import os
 import time
@@ -78,8 +78,12 @@ def sending_procedure(TargetDate, kind=''):
     write_log("----- Chart #1 saved !")  #~
 
     write_log("----- Drawing ratio bar plot...") #~
-    hbar_plot(x_ratio, y_ratio, save_dir, pic_name)
+    hbar_plot_path = hbar_plot(x_ratio, y_ratio, save_dir, pic_name)
     write_log("----- Chart #2 saved !")  #~
+
+    write_log("----- Adding the scoreboard to the bar plot...") #~
+    scoreboard(pic_path=hbar_plot_path, x=x_ratio, y=y_ratio)
+    write_log("----- Scoreboard saved !")  #~
  
  # -------SENDING TO DISCORD------------
     write_log("----- Sending the plots to Discord the discord channel...")
@@ -249,7 +253,11 @@ def hbar_plot(x, y, save_dir, pic_name): # PLOTS THE HORIZONTAL BAR PLOT OF USER
     # PLOTTING
     plt.style.use('dark_background')
     plt.rcParams.update({'font.size': 10})
-    plt.rcParams["figure.figsize"] = (30, 12)
+    #plt.rcParams["figure.figsize"] = (30, 12)
+    px = 1/plt.rcParams['figure.dpi']  
+    plt.subplots(figsize=(2000*px, 1200*px))
+    # ----------
+
     plt.barh(sorted_x, percentages, align='center', height=0.2, color="red")   
 
     for i, v in enumerate(percentages):
@@ -271,7 +279,9 @@ def hbar_plot(x, y, save_dir, pic_name): # PLOTS THE HORIZONTAL BAR PLOT OF USER
 
     plt.xlabel("Proportion of messages")              
     plt.ylabel("User")
-    plt.title("Top 25 of the users sending the most messages")
+    plt.title("Top 25 of the users sending the more messages")
+    #plt.text(0.02 , -1 , "Charty - Marketing Dpt. v" + version + " - by Mashiro ☯#8770", color='lightgrey', fontsize=8)
+    #plt.show()
 
     #SAVING
     if not os.path.exists(save_dir):
@@ -280,6 +290,8 @@ def hbar_plot(x, y, save_dir, pic_name): # PLOTS THE HORIZONTAL BAR PLOT OF USER
     path_pic = save_dir + "/" + pic_name[0:-4] + "_leaderboard" + pic_name[-4:]
     plt.savefig(path_pic)
     plt.clf()
+
+    return path_pic
 
 def get_user_hours(df): #returns 2 arrays - x (hours), y (number of msgs)
 
@@ -296,8 +308,8 @@ def get_user_hours(df): #returns 2 arrays - x (hours), y (number of msgs)
             try:
                 users_hours[msg_authorName][msg_hour] += 1
             except:
-                if msg_authorName not in users_hours:
-                    users_hours[msg_authorName] = {}
+                #if msg_authorName not in users_hours: #CONDITION RETIREE CAR IMPLIQUEE SELON MOI
+                users_hours[msg_authorName] = {}
                 users_hours[msg_authorName][msg_hour] = 1
 
             # users_ratio here
@@ -336,8 +348,106 @@ def get_user_hours(df): #returns 2 arrays - x (hours), y (number of msgs)
 
     return order, merged_arrays, names, percentages
 
+def scoreboard(pic_path, x, y):
+
+    def ReduceOpacity(im, opacity):
+        assert opacity >= 0 and opacity <= 1
+        if im.mode != 'RGBA':
+            im = im.convert('RGBA')
+        else:
+            im = im.copy()
+        alpha = im.split()[3]
+        alpha = ImageEnhance.Brightness(alpha).enhance(opacity)
+        im.putalpha(alpha)
+        return im
+
+    def get3max(x, y):
+
+        array_copy = y[:]
+        maxs = []
+
+        try:
+            for a in range (0, 3):
+                maxs.append(x[y.index(max(array_copy))])
+                array_copy.pop(array_copy.index(max(array_copy)))
+        except:
+            while len(maxs) < 3:
+                maxs.append("")
+
+        print(maxs)
+        return maxs[0], maxs[1], maxs[2]
+
+    name1, name2, name3 = get3max(x,y)
+
+    x_shift = 350 + 1500
+    y_shift = 25
+    img = Image.new('RGB', (3000, 1200), 'black')
+
+    # LEFT PIC   
+    left_pic  = Image.open(pic_path)
+    img.paste(left_pic, (0,0))
+
+    # PUT THE NUMBERS
+    coef = 3
+    big1  = Image.open("./fonts/big1.png")
+    big1  = big1.resize((coef * big1.size[0], coef * big1.size[1]), Image.ANTIALIAS)
+    img.paste(big1, (x_shift + 0, y_shift + 100), big1)
+
+    coef = 5
+    tiny2 = Image.open("./fonts/tiny2.png")
+    tiny2 = tiny2.resize((coef * tiny2.size[0], coef * tiny2.size[1]), Image.ANTIALIAS)
+    img.paste(tiny2, (x_shift + 0, y_shift + 500), tiny2)
+
+    coef = 5
+    tiny3 = Image.open("./fonts/tiny3.png")
+    tiny3 = tiny3.resize((coef * tiny3.size[0], coef * tiny3.size[1]), Image.ANTIALIAS)
+    img.paste(tiny3, (x_shift + 0, y_shift + 825), tiny3)
+
+    # PUT THE STATUS WORDS
+    coef = int(1/4)
+    excellent = Image.open("./fonts/excellent.png")
+    excellent = excellent.resize((coef * excellent.size[0] + 375, coef * excellent.size[1] + 50), Image.ANTIALIAS)
+    excellent = ReduceOpacity(excellent, 0.5)
+    excellent = excellent.rotate(15, Image.NEAREST, expand = 1)
+    img.paste(excellent, (x_shift + 130, y_shift + 50))
+
+    coef = int(1/4)
+    great = Image.open("./fonts/great.png")
+    great = great.resize((coef * great.size[0] + 200, coef * great.size[1] + 50), Image.ANTIALIAS)
+    great = ReduceOpacity(great, 0.5)
+    great = great.rotate(15, Image.NEAREST, expand = 1)
+    img.paste(great, (x_shift + 130, y_shift + 450))
+
+    coef = int(1/4)
+    good = Image.open("./fonts/good.png")
+    good = good.resize((coef * good.size[0] + 175, coef * good.size[1] + 50), Image.ANTIALIAS)
+    good = ReduceOpacity(good, 0.5)
+    good = good.rotate(15, Image.NEAREST, expand = 1)
+    img.paste(good, (x_shift + 130, y_shift + 775))
+
+    # ADD THE TEXT
+    font_name = "./fonts/SuperMario256.ttf"
+    draw = ImageDraw.Draw(img)
+
+    first = ImageFont.truetype(font_name, 70)
+    second_and_third = ImageFont.truetype(font_name, 70)
+    draw.text((x_shift + 200, y_shift + 225), name1[0:-5], (255,255,255),font=first)
+    draw.text((x_shift + 200, y_shift + 575), name2[0:-5], (255,255,255),font=second_and_third)
+    draw.text((x_shift + 200, y_shift + 900), name3[0:-5], (255,255,255),font=second_and_third)
+
+    tags = ImageFont.truetype(font_name, 50)
+    draw.text((x_shift + 200, y_shift + 300), name1[-5:],(255,255,255),font=tags) 
+    draw.text((x_shift + 200, y_shift + 650), name2[-5:],(255,255,255),font=tags)  
+    draw.text((x_shift + 200, y_shift + 975),name3[-5:],(255,255,255),font=tags)   
+
+    output = pic_path[:-4] + "_scoreboard.png"
+    img.save(output)
+    img.show()
+
+
+
 global version        
-version = "1.2"
+version = "1.3"
 version_check()
 
 global client_info    
