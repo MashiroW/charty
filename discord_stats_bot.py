@@ -94,7 +94,7 @@ def sending_procedure(TargetDate, kind=''):
     write_log("----- Chart #1 sent...")
 
     #CHART 2
-    picture_to_discord(path=save_dir + "/" + pic_name[0:-4] + "_leaderboard" + pic_name[-4:], webhook_URL=client_info["webhook_url"], message="")
+    picture_to_discord(path=save_dir + "/" + pic_name[0:-4] + "_leaderboard_scoreboard" + pic_name[-4:], webhook_URL=client_info["webhook_url"], message="")
     write_log("----- Chart #2 sent...")
 
     #picture_to_discord(path=None, webhook_URL=client_info["webhook_url"], message=pie_chart_txt(users_hours=users_hours)) #LINE FOR TXT PLOT
@@ -308,8 +308,8 @@ def get_user_hours(df): #returns 2 arrays - x (hours), y (number of msgs)
             try:
                 users_hours[msg_authorName][msg_hour] += 1
             except:
-                #if msg_authorName not in users_hours: #CONDITION RETIREE CAR IMPLIQUEE SELON MOI
-                users_hours[msg_authorName] = {}
+                if msg_authorName not in users_hours:
+                    users_hours[msg_authorName] = {}
                 users_hours[msg_authorName][msg_hour] = 1
 
             # users_ratio here
@@ -444,8 +444,6 @@ def scoreboard(pic_path, x, y):
     img.save(output)
     img.show()
 
-
-
 global version        
 version = "1.3"
 version_check()
@@ -490,7 +488,7 @@ while (1):
         DayTargetDate = sending_procedure(DayTargetDate, kind='daily')
 
     # CHECK FOR WEEKLY
-    if str(date.today()) == str(WeekTargetDate) and client_info["weekly"]:
+    if str(date.today()) == str(WeekTargetDate):
         write_log("Weekly plot condition OK")
         WeekTargetDate = sending_procedure(WeekTargetDate, kind='weekly')
 
