@@ -137,6 +137,10 @@ def bar_plot(x, y, color, save_dir, pic_name, xlabel, ylabel, title):
     plt.style.use('dark_background')
     plt.rcParams.update({'font.size': 10})
     plt.rcParams["figure.figsize"] = (30, 12)
+
+    px = 1/plt.rcParams['figure.dpi']  
+    plt.subplots(figsize=(3000*px, 1200*px))
+
     plt.bar(x, y, align='center', width=0.5, color=color)   
     plt.xlabel(xlabel)              
     plt.ylabel(ylabel)
@@ -363,13 +367,20 @@ def scoreboard(pic_path, x, y):
 
     def get3max(x, y):
 
-        array_copy = y[:]
+        print(x)
+        print(y)
+
+        x_copy = x[:]
+        y_copy = y[:]
         maxs = []
 
         try:
             for a in range (0, 3):
-                maxs.append(x[y.index(max(array_copy))])
-                array_copy.pop(array_copy.index(max(array_copy)))
+                maxs.append(x_copy[y_copy.index(max(y_copy))])
+
+                index_to_pop = y_copy.index(max(y_copy))
+                y_copy.pop(index_to_pop)
+                x_copy.pop(index_to_pop)
         except:
             while len(maxs) < 3:
                 maxs.append("")
@@ -381,7 +392,12 @@ def scoreboard(pic_path, x, y):
 
     x_shift = 350 + 1500
     y_shift = 25
-    img = Image.new('RGB', (3000, 1200), 'black')
+    x_shitf_TEXT = -25
+    img = Image.new('RGB', (3000, 1200), (0,0,0))
+
+    color1st = (247,220,68,100)
+    color2nd = (34,155,247,100)
+    color3rd = (35,226,76,100)
 
     # LEFT PIC   
     left_pic  = Image.open(pic_path)
@@ -426,23 +442,23 @@ def scoreboard(pic_path, x, y):
     img.paste(good, (x_shift + 130, y_shift + 775))
 
     # ADD THE TEXT
-    font_name = "./fonts/SuperMario256.ttf"
+    font_name = "./fonts/Elektronik Italic.ttf"
     draw = ImageDraw.Draw(img)
 
     first = ImageFont.truetype(font_name, 70)
     second_and_third = ImageFont.truetype(font_name, 70)
-    draw.text((x_shift + 200, y_shift + 225), name1[0:-5], (255,255,255),font=first)
-    draw.text((x_shift + 200, y_shift + 575), name2[0:-5], (255,255,255),font=second_and_third)
-    draw.text((x_shift + 200, y_shift + 900), name3[0:-5], (255,255,255),font=second_and_third)
+    draw.text((x_shitf_TEXT + x_shift + 200, y_shift + 225), name1[0:-5], color1st, font=first) 
+    draw.text((x_shitf_TEXT + x_shift + 200, y_shift + 575), name2[0:-5], color2nd, font=second_and_third)
+    draw.text((x_shitf_TEXT + x_shift + 200, y_shift + 900), name3[0:-5], color3rd, font=second_and_third)
 
     tags = ImageFont.truetype(font_name, 50)
-    draw.text((x_shift + 200, y_shift + 300), name1[-5:],(255,255,255),font=tags) 
-    draw.text((x_shift + 200, y_shift + 650), name2[-5:],(255,255,255),font=tags)  
-    draw.text((x_shift + 200, y_shift + 975),name3[-5:],(255,255,255),font=tags)   
+    draw.text((x_shitf_TEXT + x_shift + 200, y_shift + 300), name1[-5:], color1st, font=tags) 
+    draw.text((x_shitf_TEXT + x_shift + 200, y_shift + 650), name2[-5:], color2nd, font=tags)  
+    draw.text((x_shitf_TEXT + x_shift + 200, y_shift + 975),name3[-5:], color3rd, font=tags)   
 
     output = pic_path[:-4] + "_scoreboard.png"
     img.save(output)
-    img.show()
+    #img.show()
 
 global version        
 version = "1.3"
